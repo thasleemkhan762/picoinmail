@@ -3,12 +3,14 @@ const nodemailer = require('nodemailer');
 const path = require('path');
 const fs = require('fs');
 const axios = require('axios');
+const helmet = require('helmet');
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Middleware
+app.use(helmet());
 app.use(express.json());
 app.use(express.static('public'));
 
@@ -49,7 +51,6 @@ const saveSubscriptions = (subscriptions) => {
 const getPiCoinPrice = async () => {
     try {
         const response = await axios.get('https://www.okx.com/api/v5/market/ticker?instId=PI-USDT');
-        console.log('OKX API Response:', JSON.stringify(response.data, null, 2));
         if (response.data && response.data.data && response.data.data.length > 0) {
             const priceData = response.data.data[0];
             const currentPrice = parseFloat(priceData.last);
@@ -59,13 +60,6 @@ const getPiCoinPrice = async () => {
             if (isNaN(change24h) && !isNaN(currentPrice) && !isNaN(low24h)) {
                 change24h = ((currentPrice - low24h) / low24h) * 100;
             }
-            console.log('Parsed price data:', {
-                last: currentPrice,
-                change24h: change24h,
-                high24h: high24h,
-                low24h: low24h,
-                vol24h: priceData.vol24h
-            });
             return {
                 price: currentPrice,
                 change24h: change24h,
@@ -75,13 +69,13 @@ const getPiCoinPrice = async () => {
                 timestamp: new Date().toISOString()
             };
         } else {
-            console.error('Invalid API response structure:', response.data);
-            throw new Error('No price data available');
+            console.error('Invalid OKX API response structure:', response.data);
+            throw new Error('No price data available from OKX');
         }
     } catch (error) {
-        console.error('Error fetching PiCoin price:', error.message);
+        console.error('Error fetching PiCoin price from OKX:', error.message);
         if (error.response) {
-            console.error('API Error Response:', error.response.data);
+            console.error('OKX API Error Response:', error.response.data);
         }
         return null;
     }
