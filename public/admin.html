@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PiCoin Notifier - Admin</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .subscription-list {
+            margin-top: 2rem;
+            background: #2c3e50;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        
+        .subscription-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .subscription-item:last-child {
+            border-bottom: none;
+        }
+        
+        .subscription-count {
+            font-size: 1.2rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+        
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .refresh-btn:hover {
+            background: #2980b9;
+        }
+        
+        .no-subscriptions {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem;
+        }
+        
+        .price-container {
+            background: #000000;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .price-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 1rem 0;
+        }
+        
+        .price-value-inr {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 1rem 0;
+        }
+        
+        .price-change {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .price-change.positive {
+            color: #2ecc71;
+        }
+        
+        .price-change.negative {
+            color: #e74c3c;
+        }
+        
+        .price-details {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .price-detail {
+            margin: 0.5rem;
+            padding: 0.5rem;
+            background: #282a2c;
+            border-radius: 5px;
+            min-width: 120px;
+        }
+        
+        .price-detail-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .price-detail-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .price-detail-value-inr {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .refresh-price {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .refresh-price:hover {
+            background: #2980b9;
+        }
+        
+        .last-updated {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 1rem;
+        }
+        
+        .send-update-btn {
+            background: #2ecc71;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+            margin-left: 0.5rem;
+        }
+        
+        .send-update-btn:hover {
+            background: #27ae60;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <header>
+            <h1>PiCoin Notifier - Admin</h1>
+            <p>View all subscriptions and current price</p>
+        </header>
+        
+        <main>
+            <div class="price-container">
+                <h2>Current PiCoin Price</h2>
+                <div id="priceValue" class="price-value">Loading...</div>
+                <div id="priceValueInr" class="price-value-inr"></div>
+                <div id="priceChange" class="price-change"></div>
+                <div class="price-details">
+                    <div class="price-detail">
+                        <div class="price-detail-label">24h High</div>
+                        <div id="priceHigh" class="price-detail-value">-</div>
+                        <div id="priceHighInr" class="price-detail-value-inr"></div>
+                    </div>
+                    <div class="price-detail">
+                        <div class="price-detail-label">24h Low</div>
+                        <div id="priceLow" class="price-detail-value">-</div>
+                        <div id="priceLowInr" class="price-detail-value-inr"></div>
+                    </div>
+                    <div class="price-detail">
+                        <div class="price-detail-label">24h Volume</div>
+                        <div id="priceVolume" class="price-detail-value">-</div>
+                        <div id="priceVolumeInr" class="price-detail-value-inr"></div>
+                    </div>
+                </div>
+                <div class="button-group">
+                    <button id="refreshPrice" class="refresh-price">Refresh Price</button>
+                    <button id="sendUpdate" class="send-update-btn">Send Update to All</button>
+                </div>
+                <div id="lastUpdated" class="last-updated"></div>
+            </div>
+            
+            <div class="subscription-list">
+                <button id="refreshBtn" class="refresh-btn">Refresh List</button>
+                <div id="subscriptionCount" class="subscription-count"></div>
+                <div id="subscriptionsList"></div>
+            </div>
+        </main>
+        
+        <footer>
+            <p>&copy; 2024 PiCoin Value Notifier. All rights reserved.</p>
+        </footer>
+    </div>
+    <!-- Include the notification system script FIRST -->
+    <script src="notifications.js"></script>
+    <!-- Then include the admin script logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const subscriptionsList = document.getElementById('subscriptionsList');
+            const subscriptionCount = document.getElementById('subscriptionCount');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const priceValue = document.getElementById('priceValue');
+            const priceValueInr = document.getElementById('priceValueInr');
+            const priceChange = document.getElementById('priceChange');
+            const priceHigh = document.getElementById('priceHigh');
+            const priceHighInr = document.getElementById('priceHighInr');
+            const priceLow = document.getElementById('priceLow');
+            const priceLowInr = document.getElementById('priceLowInr');
+            const priceVolume = document.getElementById('priceVolume');
+            const priceVolumeInr = document.getElementById('priceVolumeInr');
+            const lastUpdated = document.getElementById('lastUpdated');
+            const refreshPrice = document.getElementById('refreshPrice');
+            const sendUpdate = document.getElementById('sendUpdate');
+            
+            // Helper function to format INR
+            const formatInr = (value) => {
+                if (value === null || typeof value !== 'number' || isNaN(value)) {
+                    return '-';
+                }
+                return `₹${value.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            };
+            
+            // Function to fetch and display subscriptions
+            const fetchSubscriptions = async () => {
+                try {
+                    const response = await fetch('/api/subscriptions');
+                    const subscriptions = await response.json();
+                    
+                    subscriptionCount.textContent = `Total Subscriptions: ${subscriptions.length}`;
+                    subscriptionsList.innerHTML = '';
+                    
+                    if (subscriptions.length === 0) {
+                        subscriptionsList.innerHTML = '<div class="no-subscriptions">No subscriptions yet</div>';
+                        return;
+                    }
+                    
+                    subscriptions.forEach(email => {
+                        const item = document.createElement('div');
+                        item.className = 'subscription-item';
+                        item.textContent = email;
+                        subscriptionsList.appendChild(item);
+                    });
+
+                    notifications.info('Subscriptions Updated', `Total subscriptions: ${subscriptions.length}`);
+                } catch (error) {
+                    console.error('Error fetching subscriptions:', error);
+                    subscriptionsList.innerHTML = '<div class="no-subscriptions">Error loading subscriptions</div>';
+                    notifications.error('Error', 'Failed to load subscriptions');
+                }
+            };
+            
+            // Function to fetch and display price
+            const fetchPrice = async () => {
+                try {
+                    const response = await fetch('/api/price');
+                    const data = await response.json();
+                    
+                    if (data.error || !data || data.price === null || typeof data.price !== 'number') {
+                        priceValue.textContent = 'N/A';
+                        priceValueInr.textContent = 'N/A';
+                        priceChange.textContent = 'Price data unavailable';
+                        priceHigh.textContent = '-';
+                        priceHighInr.textContent = '-';
+                        priceLow.textContent = '-';
+                        priceLowInr.textContent = '-';
+                        priceVolume.textContent = '-';
+                        priceVolumeInr.textContent = '-';
+                        lastUpdated.textContent = 'Last Updated: Never';
+                        notifications.error('Price Update Failed', 'Unable to fetch current price data');
+                        return;
+                    }
+                    
+                    // Update price value (USD)
+                    priceValue.textContent = `$${data.price.toFixed(4)}`;
+                    // Update price value (INR)
+                    priceValueInr.textContent = formatInr(data.price_inr);
+                    
+                    // Update price change
+                    if (typeof data.change24h === 'number' && !isNaN(data.change24h)) {
+                        const changeText = `${data.change24h > 0 ? '+' : ''}${data.change24h.toFixed(2)}%`;
+                        priceChange.textContent = changeText;
+                        priceChange.className = `price-change ${data.change24h >= 0 ? 'positive' : 'negative'}`;
+                    } else {
+                        console.warn('Invalid change24h value:', data.change24h);
+                        priceChange.textContent = 'Change data unavailable';
+                    }
+                    
+                    // Update other price details (USD)
+                    priceHigh.textContent = (typeof data.high24h === 'number' && !isNaN(data.high24h)) ? 
+                        `$${data.high24h.toFixed(4)}` : '-';
+                    priceLow.textContent = (typeof data.low24h === 'number' && !isNaN(data.low24h)) ? 
+                        `$${data.low24h.toFixed(4)}` : '-';
+                    priceVolume.textContent = (typeof data.volume24h === 'number' && !isNaN(data.volume24h)) ? 
+                        `$${data.volume24h.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '-';
+
+                    // Update other price details (INR)
+                    priceHighInr.textContent = formatInr(data.high24h_inr);
+                    priceLowInr.textContent = formatInr(data.low24h_inr);
+                    priceVolumeInr.textContent = formatInr(data.volume24h_inr);
+                    
+                    // Update last updated time
+                    if (data.timestamp) {
+                        const date = new Date(data.timestamp);
+                        lastUpdated.textContent = `Last Updated: ${date.toLocaleString()}`;
+                    } else {
+                        lastUpdated.textContent = 'Last Updated: Unknown';
+                    }
+
+                     // Show notification only if price_inr is available (indicates successful conversion)
+                    if (data.price_inr !== null) {
+                         notifications.info('Price Updated', `Current PiCoin price: ${priceValue.textContent} / ${priceValueInr.textContent}`);
+                    } else {
+                         notifications.info('Price Updated', `Current PiCoin price: ${priceValue.textContent} (INR unavailable)`);
+                    }
+
+                } catch (error) {
+                    console.error('Error fetching price:', error);
+                    priceValue.textContent = 'Error';
+                    priceValueInr.textContent = ''; // Clear INR on error
+                    priceChange.textContent = 'Failed to fetch price data';
+                    priceHigh.textContent = '-';
+                    priceHighInr.textContent = '';
+                    priceLow.textContent = '-';
+                    priceLowInr.textContent = '';
+                    priceVolume.textContent = '-';
+                    priceVolumeInr.textContent = '';
+                    lastUpdated.textContent = 'Last Updated: Never';
+                    notifications.error('Error', 'Failed to fetch price data');
+                }
+            };
+            
+            // Function to send update to all subscribers
+            const sendUpdateToAll = async () => {
+                try {
+                    notifications.info('Sending Updates', 'Sending price updates to all subscribers...');
+                    const response = await fetch('/api/send-update', { method: 'POST' });
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        notifications.success('Success', 'Updates sent successfully to all subscribers!');
+                    } else {
+                        notifications.error('Error', data.message || 'Failed to send updates');
+                    }
+                } catch (error) {
+                    console.error('Error sending update:', error);
+                    notifications.error('Error', 'Failed to send updates to subscribers');
+                }
+            };
+            
+            // Fetch subscriptions on page load
+            fetchSubscriptions();
+            
+            // Fetch price on page load
+            fetchPrice();
+            
+            // Refresh button event listener
+            refreshBtn.addEventListener('click', () => {
+                notifications.info('Refreshing', 'Updating subscription list...');
+                fetchSubscriptions();
+            });
+            
+            // Refresh price button event listener
+            refreshPrice.addEventListener('click', () => {
+                notifications.info('Refreshing', 'Fetching latest PiCoin price...');
+                fetchPrice();
+            });
+            
+            // Send update button event listener
+            sendUpdate.addEventListener('click', sendUpdateToAll);
+            
+            // Auto-refresh price every 5 minutes
+            setInterval(fetchPrice, 5 * 60 * 1000);
+            
+            // Show welcome notification
+            notifications.info('Welcome', 'Welcome to the PiCoin Admin Dashboard');
+        });
+    </script>
+</body>
+</html> 

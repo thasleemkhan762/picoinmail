@@ -1,0 +1,584 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+    color: #333;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+header h1 {
+    color: #ffffff;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+header p {
+    color: #e0e0e0;
+    font-size: 1.2rem;
+}
+
+.subscription-form {
+    background: #34495e;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+.subscription-form h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #bdc3c7;
+}
+
+input[type="email"] {
+    width: 100%;
+    padding: 0.8rem;
+    border: 2px solid #566573;
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+input[type="email"]::placeholder {
+    color: #7f8c8d;
+}
+
+input[type="email"]:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+button {
+    width: 100%;
+    padding: 1rem;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #2980b9;
+}
+
+.message {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.message.success {
+    background: #2ecc71;
+    color: white;
+}
+
+.message.error {
+    background: #e74c3c;
+    color: white;
+}
+
+footer {
+    text-align: center;
+    margin-top: 3rem;
+    color: #7f8c8d;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .subscription-form {
+        padding: 1.5rem;
+    }
+}
+
+/* Notification System */
+.notification-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notification {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    animation: slideIn 0.3s ease-out;
+    position: relative;
+    overflow: hidden;
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+    transform-origin: right;
+}
+
+.notification:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.notification.success {
+    border-left-color: #2ecc71;
+    background: linear-gradient(to right, rgba(46, 204, 113, 0.05), white);
+}
+
+.notification.error {
+    border-left-color: #e74c3c;
+    background: linear-gradient(to right, rgba(231, 76, 60, 0.05), white);
+}
+
+.notification.info {
+    border-left-color: #3498db;
+    background: linear-gradient(to right, rgba(52, 152, 219, 0.05), white);
+}
+
+.notification.warning {
+    border-left-color: #f1c40f;
+    background: linear-gradient(to right, rgba(241, 196, 15, 0.05), white);
+}
+
+.notification-content {
+    flex-grow: 1;
+    margin-right: 12px;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #2c3e50;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
+
+.notification-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.notification.success .notification-title::before {
+    background-color: #2ecc71;
+}
+
+.notification.error .notification-title::before {
+    background-color: #e74c3c;
+}
+
+.notification.info .notification-title::before {
+    background-color: #3498db;
+}
+
+.notification.warning .notification-title::before {
+    background-color: #f1c40f;
+}
+
+.notification-message {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    color: #95a5a6;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 1.2rem;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-close:hover {
+    opacity: 1;
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Progress bar for notifications */
+.notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.notification.success .notification-progress {
+    background-color: rgba(46, 204, 113, 0.3);
+}
+
+.notification.error .notification-progress {
+    background-color: rgba(231, 76, 60, 0.3);
+}
+
+.notification.info .notification-progress {
+    background-color: rgba(52, 152, 219, 0.3);
+}
+
+.notification.warning .notification-progress {
+    background-color: rgba(241, 196, 15, 0.3);
+}
+
+/* Notification icons */
+.notification-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    margin-right: 12px;
+    font-weight: bold;
+}
+
+.notification.success .notification-icon {
+    background-color: rgba(46, 204, 113, 0.1);
+    color: #2ecc71;
+}
+
+.notification.error .notification-icon {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.notification.info .notification-icon {
+    background-color: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.notification.warning .notification-icon {
+    background-color: rgba(241, 196, 15, 0.1);
+    color: #f1c40f;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.notification.hiding {
+    animation: slideOut 0.3s ease-in forwards;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #f0f0f0;
+    }
+    
+    .notification {
+        background: #2c3e50;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+    }
+    
+    .notification.success {
+        background: linear-gradient(to right, rgba(46, 204, 113, 0.2), #2c3e50);
+    }
+    
+    .notification.error {
+        background: linear-gradient(to right, rgba(231, 76, 60, 0.2), #2c3e50);
+    }
+    
+    .notification.info {
+        background: linear-gradient(to right, rgba(52, 152, 219, 0.2), #2c3e50);
+    }
+    
+    .notification.warning {
+        background: linear-gradient(to right, rgba(241, 196, 15, 0.2), #2c3e50);
+    }
+    
+    .notification-title {
+        color: #ffffff;
+        font-weight: 700;
+    }
+    
+    .notification-message {
+        color: #ecf0f1;
+        font-weight: 500;
+    }
+    
+    .notification-close {
+        color: #ecf0f1;
+    }
+    
+    .notification-close:hover {
+        background-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .notification-progress {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    header h1 {
+        color: #ffffff;
+    }
+
+    header p {
+        color: #e0e0e0;
+    }
+
+    .subscription-form,
+    .subscription-list {
+        background: #2c3e50;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    .subscription-form h2,
+    .price-container h2 {
+        color: #ffffff;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .price-detail-label,
+    .subscription-count,
+    .no-subscriptions,
+    label,
+    .last-updated {
+        color: #bdc3c7;
+    }
+
+    .price-container .price-detail-label {
+        color: #d0d0d0;
+    }
+
+    .price-detail-value,
+    .subscription-item {
+        color: #ecf0f1;
+    }
+
+    .price-value {
+        color: #ffffff;
+    }
+
+    .price-change.positive {
+        color: #2ecc71;
+    }
+
+    .price-change.negative {
+        color: #e74c3c;
+    }
+
+    input[type="email"] {
+        background-color: #34495e;
+        border-color: #566573;
+        color: #ecf0f1;
+    }
+
+    input[type="email"]:focus {
+        border-color: #3498db;
+    }
+
+    .price-value-inr {
+        color: #bdc3c7;
+    }
+    
+    .price-container .price-detail-value {
+        color: #ffffff;
+    }
+
+    .price-container .price-detail-value-inr {
+        color: #bdc3c7;
+    }
+
+    .subscription-list .subscription-item {
+        color: #ecf0f1;
+    }
+}
+
+/* Pi icon style */
+.pi-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    font-weight: bold;
+    line-height: 1;
+}
+
+/* Make cards dark by default, except price container */
+.subscription-form,
+.subscription-list {
+    background: #34495e;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Style price container separately with grey background */
+.price-container {
+    background: #4a4a4a; /* Medium grey background */
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+    margin-bottom: 2rem; /* Ensure spacing if needed */
+    text-align: center; /* Keep text centered */
+}
+
+/* Adjust text colors inside dark cards */
+.subscription-form h2,
+.price-container h2 {
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.price-detail-label,
+.subscription-count,
+.no-subscriptions,
+label,
+.last-updated {
+    color: #bdc3c7;
+}
+
+/* Make price detail labels slightly lighter on grey background */
+.price-container .price-detail-label {
+    color: #d0d0d0;
+}
+
+.price-detail-value,
+.subscription-item {
+    color: #ecf0f1;
+}
+
+.price-value {
+    color: #ffffff;
+    margin-bottom: 0.25rem; /* Reduce margin below USD price */
+}
+
+.price-value-inr {
+    color: #bdc3c7; /* Lighter grey */
+    font-size: 1.5rem; /* Smaller font size */
+    font-weight: 500; /* Medium weight */
+    margin-bottom: 1rem; /* Space below INR price */
+    display: block; /* Ensure it appears on its own line */
+    min-height: 1.8rem; /* Prevent layout shift when loading */
+}
+
+.price-detail-value {
+    color: #ecf0f1;
+    margin-bottom: 0.1rem; /* Small space below USD */
+}
+
+.price-detail-value-inr {
+    color: #bdc3c7; /* Lighter grey */
+    font-size: 0.9em; /* Slightly smaller than USD value */
+    display: block; /* Ensure it appears on its own line */
+    min-height: 1.1rem; /* Prevent layout shift when loading */
+}
+
+/* Dark mode support (adjustments might be needed or simplified) */
+@media (prefers-color-scheme: dark) {
+    body {
+        color: #f0f0f0;
+    }
+    
+    .subscription-form,
+    .subscription-list {
+        background: #2c3e50;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Price container keeps its grey background in dark mode */
+    .price-container {
+        /* Already set to #4a4a4a, ensure contrast is still good */
+    }
+
+    /* Text colors might need slight adjustment on grey */
+    .price-container .price-detail-label {
+        color: #d0d0d0;
+    }
+    
+    .price-container .price-detail-value {
+        color: #ffffff; /* Brighter value on grey */
+    }
+
+    .price-container .price-detail-value-inr {
+        color: #bdc3c7;
+    }
+
+    /* ... rest of dark mode styles ... */
+} 
