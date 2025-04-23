@@ -84,8 +84,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         const delay = nextFetch.getTime() - now.getTime();
-        setTimeout(() => {
-            fetchPrice();
+        setTimeout(async () => {
+            await fetchPrice();
+            // Send update emails after fetching new price
+            try {
+                const response = await fetch('/api/send-update', {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                if (result.success) {
+                    console.log('Scheduled price update emails sent successfully');
+                } else {
+                    console.error('Failed to send scheduled price update emails:', result.message);
+                }
+            } catch (error) {
+                console.error('Error sending scheduled price update emails:', error);
+            }
             scheduleNextFetch(); // Schedule next fetch after current one
         }, delay);
     };
@@ -203,11 +217,31 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchPrice();
     });
 
-    sendUpdate.addEventListener('click', () => {
+    sendUpdate.addEventListener('click', async () => {
         if (window.notifications) {
             notifications.info('Sending Updates', 'Sending price updates to all subscribers...');
         }
-        fetchPrice();
+        try {
+            const response = await fetch('/api/send-update', {
+                method: 'POST'
+            });
+            const result = await response.json();
+            
+            if (result.success) {
+                if (window.notifications) {
+                    notifications.success('Updates Sent', 'Price updates sent successfully to all subscribers');
+                }
+            } else {
+                if (window.notifications) {
+                    notifications.error('Update Failed', result.message || 'Failed to send updates');
+                }
+            }
+        } catch (error) {
+            console.error('Error sending updates:', error);
+            if (window.notifications) {
+                notifications.error('Update Failed', 'Failed to send price updates');
+            }
+        }
     });
 
     // Initial data fetch

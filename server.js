@@ -271,6 +271,9 @@ const sendPriceUpdateEmails = async () => {
 };
 
 // Schedule price update emails (every 24 hours)
+// Call immediately on startup
+sendPriceUpdateEmails();
+// Then schedule for every 24 hours
 setInterval(sendPriceUpdateEmails, 24 * 60 * 60 * 1000);
 
 app.listen(port, () => {
