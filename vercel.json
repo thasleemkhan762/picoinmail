@@ -10,6 +10,12 @@
       "use": "@vercel/static"
     }
   ],
+  "crons": [
+    {
+      "path": "/api/send-update",
+      "schedule": "0 8,11,14,17,20,23 * * *"
+    }
+  ],
   "routes": [
     {
       "src": "/styles.css",

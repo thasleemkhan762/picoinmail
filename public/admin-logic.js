@@ -56,72 +56,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Function to check if it's time to fetch price
-    const shouldFetchPrice = () => {
-        const now = new Date();
-        const hour = now.getHours();
-        const minute = now.getMinutes();
+    // Update schedule information in the UI
+    const updateScheduleInfo = () => {
+        const scheduleInfo = document.createElement('div');
+        scheduleInfo.className = 'schedule-info';
+        scheduleInfo.innerHTML = `
+            <h3>Email Update Schedule</h3>
+            <p>Updates are automatically sent at:</p>
+            <ul>
+                <li>8:00 AM</li>
+                <li>11:00 AM</li>
+                <li>2:00 PM</li>
+                <li>5:00 PM</li>
+                <li>8:00 PM</li>
+                <li>11:00 PM</li>
+            </ul>
+        `;
         
-        // Check if current time matches any of our target times (8 AM, 11 AM, 2 PM, 5 PM, 8 PM, 11 PM)
-        return (hour === 8 && minute === 0) || 
-               (hour === 11 && minute === 0) || 
-               (hour === 14 && minute === 0) || 
-               (hour === 17 && minute === 0) || 
-               (hour === 20 && minute === 0) || 
-               (hour === 23 && minute === 0);
-    };
-
-    // Function to schedule next price fetch
-    const scheduleNextFetch = () => {
-        const now = new Date();
-        const nextFetch = new Date(now);
-        
-        // Find the next target time (8 AM, 11 AM, 2 PM, 5 PM, 8 PM, 11 PM)
-        const targetHours = [8, 11, 14, 17, 20, 23];
-        let foundNextTime = false;
-        
-        // First check if we can schedule for today
-        for (const hour of targetHours) {
-            nextFetch.setHours(hour, 0, 0, 0);
-            if (nextFetch.getTime() > now.getTime()) {
-                foundNextTime = true;
-                break;
-            }
+        // Insert after the price section
+        const priceSection = document.querySelector('.price-section');
+        if (priceSection && !document.querySelector('.schedule-info')) {
+            priceSection.parentNode.insertBefore(scheduleInfo, priceSection.nextSibling);
         }
-        
-        // If no remaining times today, schedule for first time tomorrow
-        if (!foundNextTime) {
-            nextFetch.setDate(nextFetch.getDate() + 1);
-            nextFetch.setHours(targetHours[0], 0, 0, 0);
-        }
-        
-        const delay = nextFetch.getTime() - now.getTime();
-        console.log(`Next price fetch scheduled for: ${nextFetch.toLocaleString()}`);
-        
-        setTimeout(async () => {
-            try {
-                await fetchPrice();
-                // Send update emails after fetching new price
-                try {
-                    const response = await fetch('/api/send-update', {
-                        method: 'POST'
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                        console.log('Scheduled price update emails sent successfully');
-                    } else {
-                        console.error('Failed to send scheduled price update emails:', result.message);
-                    }
-                } catch (error) {
-                    console.error('Error sending scheduled price update emails:', error);
-                }
-            } catch (error) {
-                console.error('Error in scheduled price fetch:', error);
-            } finally {
-                // Schedule next fetch regardless of success/failure
-                scheduleNextFetch();
-            }
-        }, delay);
     };
 
     // Function to fetch and display price
@@ -264,12 +220,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Initial data fetch
-    fetchSubscriptions();
+    // Initial fetch and UI setup
     fetchPrice();
-    
-    // Schedule next fetch
-    scheduleNextFetch();
+    fetchSubscriptions();
+    updateScheduleInfo();
     
     // Show welcome notification
     if (window.notifications) {

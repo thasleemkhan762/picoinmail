@@ -154,45 +154,11 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchPrice();
     });
 
-    // Function to check if it's time to fetch price
-    const shouldFetchPrice = () => {
-        const now = new Date();
-        const hour = now.getHours();
-        const minute = now.getMinutes();
-        
-        // Check if current time matches any of our target times (8 AM, 1 PM, 9 PM)
-        return (hour === 8 && minute === 0) || 
-               (hour === 13 && minute === 0) || 
-               (hour === 21 && minute === 0);
-    };
-
-    // Function to schedule next price fetch
-    const scheduleNextFetch = () => {
-        const now = new Date();
-        const nextFetch = new Date(now);
-        
-        // Set to next hour
-        nextFetch.setHours(now.getHours() + 1);
-        nextFetch.setMinutes(0);
-        nextFetch.setSeconds(0);
-        
-        // If next hour is not one of our target times, find the next target time
-        while (![8, 13, 21].includes(nextFetch.getHours())) {
-            nextFetch.setHours(nextFetch.getHours() + 1);
-        }
-        
-        const delay = nextFetch.getTime() - now.getTime();
-        setTimeout(() => {
-            fetchPrice();
-            scheduleNextFetch(); // Schedule next fetch after current one
-        }, delay);
-    };
+    // Auto-refresh price every 5 minutes
+    setInterval(fetchPrice, 5 * 60 * 1000);
 
     // Initial fetch
     fetchPrice();
-    
-    // Schedule next fetch
-    scheduleNextFetch();
     
     // Show welcome notification
     notifications.info('Welcome', 'Welcome to PiCoin Price Tracker');
