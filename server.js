@@ -270,12 +270,47 @@ const sendPriceUpdateEmails = async () => {
     console.log(`Sent price update emails to ${subscriptions.length} subscribers.`);
 };
 
-// Schedule price update emails (every 24 hours)
-// Call immediately on startup
-sendPriceUpdateEmails();
-// Then schedule for every 24 hours
-setInterval(sendPriceUpdateEmails, 24 * 60 * 60 * 1000);
+// Function to schedule next update at target times (8 AM, 11 AM, 2 PM, 5 PM, 8 PM, 11 PM)
+const scheduleNextUpdate = () => {
+    const now = new Date();
+    const nextUpdate = new Date(now);
+    const targetHours = [8, 11, 14, 17, 20, 23];
+    let foundNextTime = false;
+    
+    // First check if we can schedule for today
+    for (const hour of targetHours) {
+        nextUpdate.setHours(hour, 0, 0, 0);
+        if (nextUpdate.getTime() > now.getTime()) {
+            foundNextTime = true;
+            break;
+        }
+    }
+    
+    // If no remaining times today, schedule for first time tomorrow
+    if (!foundNextTime) {
+        nextUpdate.setDate(nextUpdate.getDate() + 1);
+        nextUpdate.setHours(targetHours[0], 0, 0, 0);
+    }
+    
+    const delay = nextUpdate.getTime() - now.getTime();
+    console.log(`Next price update scheduled for: ${nextUpdate.toLocaleString()}`);
+    
+    setTimeout(async () => {
+        try {
+            await sendPriceUpdateEmails();
+            console.log('Scheduled price update completed successfully');
+        } catch (error) {
+            console.error('Error in scheduled price update:', error);
+        } finally {
+            // Schedule next update regardless of success/failure
+            scheduleNextUpdate();
+        }
+    }, delay);
+};
+
+// Start the scheduling system
+scheduleNextUpdate();
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-}); 
+});

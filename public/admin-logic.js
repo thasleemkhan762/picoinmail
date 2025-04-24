@@ -62,10 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const hour = now.getHours();
         const minute = now.getMinutes();
         
-        // Check if current time matches any of our target times (8 AM, 1 PM, 9 PM)
+        // Check if current time matches any of our target times (8 AM, 11 AM, 2 PM, 5 PM, 8 PM, 11 PM)
         return (hour === 8 && minute === 0) || 
-               (hour === 13 && minute === 0) || 
-               (hour === 21 && minute === 0);
+               (hour === 11 && minute === 0) || 
+               (hour === 14 && minute === 0) || 
+               (hour === 17 && minute === 0) || 
+               (hour === 20 && minute === 0) || 
+               (hour === 23 && minute === 0);
     };
 
     // Function to schedule next price fetch
@@ -73,34 +76,51 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         const nextFetch = new Date(now);
         
-        // Set to next hour
-        nextFetch.setHours(now.getHours() + 1);
-        nextFetch.setMinutes(0);
-        nextFetch.setSeconds(0);
+        // Find the next target time (8 AM, 11 AM, 2 PM, 5 PM, 8 PM, 11 PM)
+        const targetHours = [8, 11, 14, 17, 20, 23];
+        let foundNextTime = false;
         
-        // If next hour is not one of our target times, find the next target time
-        while (![8, 13, 21].includes(nextFetch.getHours())) {
-            nextFetch.setHours(nextFetch.getHours() + 1);
+        // First check if we can schedule for today
+        for (const hour of targetHours) {
+            nextFetch.setHours(hour, 0, 0, 0);
+            if (nextFetch.getTime() > now.getTime()) {
+                foundNextTime = true;
+                break;
+            }
+        }
+        
+        // If no remaining times today, schedule for first time tomorrow
+        if (!foundNextTime) {
+            nextFetch.setDate(nextFetch.getDate() + 1);
+            nextFetch.setHours(targetHours[0], 0, 0, 0);
         }
         
         const delay = nextFetch.getTime() - now.getTime();
+        console.log(`Next price fetch scheduled for: ${nextFetch.toLocaleString()}`);
+        
         setTimeout(async () => {
-            await fetchPrice();
-            // Send update emails after fetching new price
             try {
-                const response = await fetch('/api/send-update', {
-                    method: 'POST'
-                });
-                const result = await response.json();
-                if (result.success) {
-                    console.log('Scheduled price update emails sent successfully');
-                } else {
-                    console.error('Failed to send scheduled price update emails:', result.message);
+                await fetchPrice();
+                // Send update emails after fetching new price
+                try {
+                    const response = await fetch('/api/send-update', {
+                        method: 'POST'
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        console.log('Scheduled price update emails sent successfully');
+                    } else {
+                        console.error('Failed to send scheduled price update emails:', result.message);
+                    }
+                } catch (error) {
+                    console.error('Error sending scheduled price update emails:', error);
                 }
             } catch (error) {
-                console.error('Error sending scheduled price update emails:', error);
+                console.error('Error in scheduled price fetch:', error);
+            } finally {
+                // Schedule next fetch regardless of success/failure
+                scheduleNextFetch();
             }
-            scheduleNextFetch(); // Schedule next fetch after current one
         }, delay);
     };
 
