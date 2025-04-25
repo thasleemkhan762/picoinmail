@@ -230,6 +230,12 @@ app.post('/subscribe', async (req, res) => {
 
 // Function to send price update emails (uses refactored function)
 const sendPriceUpdateEmails = async () => {
+    console.log('Starting email update process...');
+    console.log('Email configuration:', {
+        user: process.env.EMAIL_USER ? 'Set' : 'Not set',
+        pass: process.env.EMAIL_PASS ? 'Set' : 'Not set'
+    });
+    
     const priceData = await getCombinedPriceData();
     if (!priceData || priceData.price === null) {
         console.warn("Skipping email update, failed to get valid price data.");
@@ -266,13 +272,44 @@ const sendPriceUpdateEmails = async () => {
         });
     });
     
-    await Promise.all(emailPromises);
-    console.log(`Sent price update emails to ${subscriptions.length} subscribers.`);
+    try {
+        const results = await Promise.all(emailPromises);
+        const successfulEmails = results.filter(result => result !== null).length;
+        const failedEmails = subscriptions.length - successfulEmails;
+        console.log(`Email sending complete:
+            - Total subscribers: ${subscriptions.length}
+            - Successfully sent: ${successfulEmails}
+            - Failed: ${failedEmails}`);
+    } catch (error) {
+        console.error('Fatal error in email sending:', error);
+        throw error;
+    }
 };
 
 // Scheduling is now handled by Vercel Cron Jobs
 // See vercel.json for the cron schedule configuration
 
+// Function to get next update time in IST
+const getNextUpdateTime = () => {
+    const now = new Date();
+    const updateHours = [8, 11, 14, 17, 20, 23];
+    
+    // Find the next update hour
+    const currentHour = now.getHours();
+    const nextHour = updateHours.find(h => h > currentHour) || updateHours[0];
+    
+    // Create the next update time
+    const nextUpdate = new Date(now);
+    if (nextHour <= currentHour) {
+        // If no more updates today, set for tomorrow
+        nextUpdate.setDate(nextUpdate.getDate() + 1);
+    }
+    nextUpdate.setHours(nextHour, 0, 0, 0);
+    
+    return nextUpdate;
+};
+
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+    const nextUpdate = getNextUpdateTime();
+    console.log(`Next price update scheduled for: ${nextUpdate.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' })} IST`);
 });
