@@ -144,23 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 notifications.info('Price Updated', `Current PiCoin price: ${priceValue.textContent} (INR unavailable)`);
             }
 
-            // If this is a scheduled fetch (8 AM, 1 PM, or 9 PM), send email updates
-            if (shouldFetchPrice()) {
-                try {
-                    notifications.info('Sending Updates', 'Sending price updates to all subscribers...');
-                    const updateResponse = await fetch('/api/send-update', { method: 'POST' });
-                    const updateData = await updateResponse.json();
-                    
-                    if (updateData.success) {
-                        notifications.success('Success', 'Updates sent successfully to all subscribers!');
-                    } else {
-                        notifications.error('Error', updateData.message || 'Failed to send updates');
-                    }
-                } catch (error) {
-                    console.error('Error sending update:', error);
-                    notifications.error('Error', 'Failed to send updates to subscribers');
-                }
-            }
+            // Don't automatically send updates on price fetch - updates are handled by cron job
 
         } catch (error) {
             console.error('Error fetching price:', error);
