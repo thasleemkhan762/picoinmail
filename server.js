@@ -292,19 +292,15 @@ const sendPriceUpdateEmails = async () => {
 // Function to get next update time in IST
 const getNextUpdateTime = () => {
     const now = new Date();
-    const updateHours = [8, 11, 14, 17, 20, 23];
-    
-    // Find the next update hour
-    const currentHour = now.getHours();
-    const nextHour = updateHours.find(h => h > currentHour) || updateHours[0];
-    
-    // Create the next update time
     const nextUpdate = new Date(now);
-    if (nextHour <= currentHour) {
-        // If no more updates today, set for tomorrow
+    
+    // Set time to 1:00 PM
+    nextUpdate.setHours(13, 0, 0, 0);
+    
+    // If it's already past 1 PM today, set for tomorrow
+    if (now.getHours() >= 13) {
         nextUpdate.setDate(nextUpdate.getDate() + 1);
     }
-    nextUpdate.setHours(nextHour, 0, 0, 0);
     
     return nextUpdate;
 };
